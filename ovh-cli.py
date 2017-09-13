@@ -98,10 +98,12 @@ def init_arg_parser(endpoint, refresh=False):
     # First attempt to load parser from cache
     try:
         if not refresh:
-            with open(cache_file, 'r') as f:
-                return pickle.load(f)
-    except:
-        pass
+            if os.path.exists(cache_file):
+                with open(cache_file, 'rb') as f:
+                    return pickle.load(f)
+    except Exception as e:
+        print "failed to load cached schemas from {}. use --refresh to refresh cache.".format(cache_file, e)
+        raise
 
     # cache dir exists ?
     if not os.path.exists(SCHEMAS_BASE_PATH):
@@ -136,7 +138,7 @@ def init_arg_parser(endpoint, refresh=False):
                 )
 
     # cache resulting parser
-    with open(cache_file, 'w') as f:
+    with open(cache_file, 'wb') as f:
         pickle.dump(parser, f, pickle.HIGHEST_PROTOCOL)
 
     return parser
@@ -155,9 +157,9 @@ if __name__ == '__main__':
     # load and validate endpoint name from cli name
     endpoint = os.path.basename(sys.argv[0])
     if endpoint not in ENDPOINTS:
-        print >> sys.stderr, "Unknown endpoint", endpoint
-        sys.exit(1)
-
+        endpoint = "ovh-eu"
+        print "using default endpoint: {}".format(endpoint)
+    
     args = sys.argv[1:]
 
     # special/top level arguments:

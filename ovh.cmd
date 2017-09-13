@@ -1,0 +1,1 @@
+python ovh-cli.py %*
