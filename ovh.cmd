@@ -1,1 +1,1 @@
-python ovh-cli.py %*
+python %~dp0\ovh-cli.py %*
